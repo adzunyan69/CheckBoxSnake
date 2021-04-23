@@ -2,21 +2,22 @@
 
 Snake::Snake(QObject *parent) : QObject(parent)
 {
-    snakeBody = {QPoint(0, 0), QPoint(1, 0), QPoint(1, 1)};
+    snakeBody = {QPoint(0, 0), QPoint(1, 0), QPoint(1, 1), QPoint(2, 1), QPoint(3, 1), QPoint(4, 1)};
     direction = RIGHT;
 }
 
 void Snake::start()
 {
-    stepTimer.setInterval(500);
+    stepTimer.setInterval(1000);
     connect(&stepTimer, SIGNAL(timeout()), this, SLOT(snakeStep()));
+    connect(this, SIGNAL(foodEaten()), this, SLOT(snakeLvlUp()));
     stepTimer.start();
     emit snakeBodyChanged(snakeBody);
 }
 
 void Snake::directionChange(Snake::Direction _direction)
 {
-    qDebug() << "Direction change";
+    qDebug() << "Direction chang";
     if(snakeBody.size() == 1)
     {
         direction = _direction;
@@ -51,8 +52,22 @@ void Snake::directionChange(Snake::Direction _direction)
     direction = _direction;
 }
 
+void Snake::snakeLvlUp()
+{
+    snakeBody.resize(snakeBody.size() + 1);
+    snakeBody.last() = currentFood;
+    emit snakeNeedsFood();
+}
+
 void Snake::snakeStep()
 {
+    if(isEat())
+    {
+        qDebug() << "Snake has eaten food";
+        emit foodEaten();
+        return;
+    }
+
     for(SnakeBody::iterator it = snakeBody.begin();  it != snakeBody.end() - 1; ++it)
         *it = *(it + 1);
 
@@ -86,6 +101,46 @@ void Snake::snakeStep()
 
     emit snakeBodyChanged(snakeBody);
     qDebug() << "NewPosition: " << snakeBody;
+
+    if(isCollision())
+        emit gameOver();
+}
+
+bool Snake::isEat()
+{
+    qDebug() << "currenFood: " << currentFood;
+    switch (direction)
+    {
+    case UP:
+        if((snakeBody.last().y() - 1) == currentFood.y() && snakeBody.last().x() == currentFood.x())
+            return true;
+        break;
+    case DOWN:
+        if((snakeBody.last().y() + 1) == currentFood.y() && snakeBody.last().x() == currentFood.x())
+            return true;
+        break;
+    case LEFT:
+        if((snakeBody.last().x() - 1) == currentFood.x() && snakeBody.last().y() == currentFood.y())
+            return true;
+        break;
+    case RIGHT:
+        if((snakeBody.last().x() + 1) == currentFood.x() && snakeBody.last().y() == currentFood.y())
+            return true;
+        break;
+    }
+
+    return false;
+}
+
+bool Snake::isCollision()
+{
+    const QPoint &head = snakeBody.last();
+    for(int i = 0; i < snakeBody.size() - 1; i++)
+    {
+        if(snakeBody.at(i).x() == head.x() && snakeBody.at(i).y() == head.y())
+            return true;
+    }
+    return false;
 }
 
 

@@ -5,6 +5,8 @@
 #include <QVector>
 #include <QCheckBox>
 #include <QKeyEvent>
+#include <QMessageBox>
+#include <QRandomGenerator>
 #include "snake.h"
 
 QT_BEGIN_NAMESPACE
@@ -23,6 +25,8 @@ public:
 
 public slots:
     void drawSnake(const SnakeBody &snake);
+    void spawnFood();
+    void gameOver();
 
 
 protected:
@@ -31,6 +35,7 @@ private:
     Ui::MainWindow *ui;
 
     Snake snake;
+    SnakeBody currSnakeBody;
     Field field;
 
     void setupField();
@@ -41,6 +46,7 @@ private:
 signals:
 
     void directionChanged(Snake::Direction direction);
+    void foodSpawned(QPoint foodPoint);
 
 
 

@@ -19,6 +19,8 @@ class Snake : public QObject
 
     QPoint fieldSize;
 
+    QPoint currentFood;
+
 public:
     enum Direction { UP, DOWN, LEFT, RIGHT } direction;
 
@@ -29,10 +31,18 @@ public:
 
 public slots:
     void directionChange(Snake::Direction _direction);
-    void snakeLvlUp() { }
+    void snakeLvlUp();
     void snakeStep();
+    void foodSpawned(QPoint food) { qDebug() << "Spawn FOOD!!!" << food; currentFood = food; }
 signals:
     void snakeBodyChanged(const SnakeBody &snakeBody);
+    void foodEaten();
+    void snakeNeedsFood();
+    void gameOver();
+
+private:
+    bool isEat();
+    bool isCollision();
 };
 
 #endif // SNAKE_H
