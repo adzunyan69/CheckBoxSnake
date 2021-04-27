@@ -2,7 +2,7 @@
 
 Snake::Snake(QObject *parent) : QObject(parent)
 {
-    snakeBody = {QPoint(0, 0), QPoint(1, 0), QPoint(1, 1), QPoint(2, 1), QPoint(3, 1), QPoint(4, 1)};
+    snakeBody = {QPoint(4, 1)};
     direction = RIGHT;
 }
 
@@ -56,6 +56,7 @@ void Snake::snakeLvlUp()
 {
     snakeBody.resize(snakeBody.size() + 1);
     snakeBody.last() = currentFood;
+    stepTimer.setInterval(1000/(std::log2(++lvl)));
     emit snakeNeedsFood();
 }
 

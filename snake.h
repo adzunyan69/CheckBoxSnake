@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QPoint>
+#include <qmath.h>
 
 using SnakeBody = QVector<QPoint>;
 
@@ -15,6 +16,7 @@ class Snake : public QObject
 
 
     SnakeBody snakeBody;
+    int lvl = 1;
     QTimer stepTimer;
 
     QPoint fieldSize;
@@ -28,6 +30,7 @@ public:
     void start();
     void setFieldSize(QPoint _fieldSize) { fieldSize = _fieldSize; }
     void setFieldSize(unsigned x, unsigned y) { fieldSize.setX(x); fieldSize.setY(y); }
+    int getLvl() { return lvl; }
 
 public slots:
     void directionChange(Snake::Direction _direction);

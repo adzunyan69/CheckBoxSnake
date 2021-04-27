@@ -20,7 +20,11 @@ MainWindow::MainWindow(QWidget *parent)
     //field[3][2]->setChecked(true);
     snake.setFieldSize(fieldSize);
 
-snake.start();
+    lvlLabel = new QLabel(this);
+    ui->statusbar->addWidget(lvlLabel);
+
+    snake.start();
+
 
 }
 
@@ -44,15 +48,19 @@ void MainWindow::setupField()
     spawnFood();
 }
 
-void MainWindow::drawSnake(const SnakeBody &snake)
+void MainWindow::drawSnake(const SnakeBody &snakeBody)
 {
     clearField();
 
-    for(QPoint point: snake)
+    for(QPoint point: snakeBody)
     {
-        field[point.x()][point.y()]->setChecked(true);
-        currSnakeBody = snake;
+        QCheckBox *cb = field[point.x()][point.y()];
+        cb->setCheckState(Qt::CheckState::PartiallyChecked);
+        cb->setStyleSheet("QCheckBox {border: 1px; border-color: blue; color: blue;}");
+        currSnakeBody = snakeBody;
     }
+
+    lvlLabel->setText("Score: " + QString::number(snake.getLvl()));
 }
 
 void MainWindow::spawnFood()

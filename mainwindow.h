@@ -7,6 +7,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QRandomGenerator>
+#include <QLabel>
 #include "snake.h"
 
 QT_BEGIN_NAMESPACE
@@ -33,6 +34,8 @@ protected:
     void keyPressEvent(QKeyEvent *event);
 private:
     Ui::MainWindow *ui;
+
+    QLabel *lvlLabel;
 
     Snake snake;
     SnakeBody currSnakeBody;
