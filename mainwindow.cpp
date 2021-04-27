@@ -99,14 +99,14 @@ void MainWindow::clearField()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << "keyPress: " << event->key();
-    if(event->key() == Qt::Key_W || event->key() == Qt::Key_Up)
+    qDebug() << "keyPress: " << event->nativeVirtualKey();
+    if(event->nativeVirtualKey() == Qt::Key_W)
         emit directionChanged(Snake::UP);
-    if(event->key() == Qt::Key_S || event->key() == Qt::Key_Down)
+    if(event->nativeVirtualKey() == Qt::Key_S)
         emit directionChanged(Snake::DOWN);
-    if(event->key() == Qt::Key_A || event->key() == Qt::Key_Left)
+    if(event->nativeVirtualKey() == Qt::Key_A)
         emit directionChanged(Snake::LEFT);
-    if(event->key() == Qt::Key_D || event->key() == Qt::Key_Right)
+    if(event->nativeVirtualKey() == Qt::Key_D)
         emit directionChanged(Snake::RIGHT);
 }
 
