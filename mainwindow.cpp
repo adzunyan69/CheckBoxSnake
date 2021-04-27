@@ -7,21 +7,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(&snake, SIGNAL(snakeBodyChanged(const SnakeBody&)), this, SLOT(drawSnake(const SnakeBody&)));
-    connect(&snake, SIGNAL(gameOver()), this, SLOT(gameOver()));
-    connect(&snake, SIGNAL(snakeNeedsFood()), this, SLOT(spawnFood()));
-    connect(this, SIGNAL(directionChanged(Snake::Direction)), &snake, SLOT(directionChange(Snake::Direction)));
-    connect(this, SIGNAL(foodSpawned(QPoint)), &snake, SLOT(foodSpawned(QPoint)));
 
-
-    fieldSize = QPoint(10, 10);
+    connectObjects();
     setupField();
-
-    //field[3][2]->setChecked(true);
-    snake.setFieldSize(fieldSize);
-
-    lvlLabel = new QLabel(this);
-    ui->statusbar->addWidget(lvlLabel);
+    setupSnake();
+    setupWindow();
 
     snake.start();
 
@@ -33,8 +23,19 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::connectObjects()
+{
+    connect(&snake, SIGNAL(snakeBodyChanged(const SnakeBody&)), this, SLOT(drawSnake(const SnakeBody&)));
+    connect(&snake, SIGNAL(gameOver()), this, SLOT(gameOver()));
+    connect(&snake, SIGNAL(snakeNeedsFood()), this, SLOT(spawnFood()));
+    connect(this, SIGNAL(directionChanged(Snake::Direction)), &snake, SLOT(directionChange(Snake::Direction)));
+    connect(this, SIGNAL(foodSpawned(QPoint)), &snake, SLOT(foodSpawned(QPoint)));
+}
+
 void MainWindow::setupField()
 {
+    fieldSize = QPoint(10, 10);
+
     field = Field(fieldSize.x(), QVector<QCheckBox*>(fieldSize.y(), nullptr));
     for(int i = 0; i < fieldSize.x(); i++)
     {
@@ -48,6 +49,19 @@ void MainWindow::setupField()
     spawnFood();
 }
 
+void MainWindow::setupSnake()
+{
+    snake.setFieldSize(fieldSize);
+}
+
+void MainWindow::setupWindow()
+{
+    this->setWindowTitle("CheckBoxSnake");
+    this->setFixedSize(fieldSize.x()*25, fieldSize.y()*25);
+    lvlLabel = new QLabel(this);
+    ui->statusbar->addWidget(lvlLabel);
+}
+
 void MainWindow::drawSnake(const SnakeBody &snakeBody)
 {
     clearField();
@@ -56,7 +70,6 @@ void MainWindow::drawSnake(const SnakeBody &snakeBody)
     {
         QCheckBox *cb = field[point.x()][point.y()];
         cb->setCheckState(Qt::CheckState::PartiallyChecked);
-        cb->setStyleSheet("QCheckBox {border: 1px; border-color: blue; color: blue;}");
         currSnakeBody = snakeBody;
     }
 
@@ -99,6 +112,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::gameOver()
 {
-    QMessageBox::information(this, "Game Over", "ВЫ ПРОИГРАЛИ ЫЫЫ");
+    QMessageBox::information(this, "Game Over", "Поигали и хватит. Количество очков: " + QString::number(snake.getLvl()));
     qApp->exit();
 }

@@ -41,7 +41,10 @@ private:
     SnakeBody currSnakeBody;
     Field field;
 
+    void connectObjects();
     void setupField();
+    void setupSnake();
+    void setupWindow();
     void clearField();
 
     QPoint fieldSize;
