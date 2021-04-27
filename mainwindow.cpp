@@ -99,7 +99,7 @@ void MainWindow::clearField()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << "keyPress";
+    qDebug() << "keyPress: " << event->key();
     if(event->key() == Qt::Key_W || event->key() == Qt::Key_Up)
         emit directionChanged(Snake::UP);
     if(event->key() == Qt::Key_S || event->key() == Qt::Key_Down)

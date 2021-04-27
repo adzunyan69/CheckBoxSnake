@@ -57,6 +57,7 @@ void Snake::snakeLvlUp()
     snakeBody.resize(snakeBody.size() + 1);
     snakeBody.last() = currentFood;
     stepTimer.setInterval(1000/(std::log2(++lvl)));
+    emit snakeBodyChanged(snakeBody);
     emit snakeNeedsFood();
 }
 
