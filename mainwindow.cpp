@@ -7,14 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-
-    connectObjects();
-    setupField();
-    setupSnake();
-    setupWindow();
-
-    snake.start();
-
+    startSnake();
 
 }
 
@@ -23,25 +16,42 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::startSnake()
+{
+    snake = new Snake(this);
+    connectObjects();
+    setupField();
+    setupSnake();
+    setupWindow();
+
+    firstSetup = false;
+
+    snake->start();
+}
+
 void MainWindow::connectObjects()
 {
-    connect(&snake, SIGNAL(snakeBodyChanged(const SnakeBody&)), this, SLOT(drawSnake(const SnakeBody&)));
-    connect(&snake, SIGNAL(gameOver()), this, SLOT(gameOver()));
-    connect(&snake, SIGNAL(snakeNeedsFood()), this, SLOT(spawnFood()));
-    connect(this, SIGNAL(directionChanged(Snake::Direction)), &snake, SLOT(directionChange(Snake::Direction)));
-    connect(this, SIGNAL(foodSpawned(QPoint)), &snake, SLOT(foodSpawned(QPoint)));
+    connect(snake, SIGNAL(snakeBodyChanged(const SnakeBody&)), this, SLOT(drawSnake(const SnakeBody&)));
+    connect(snake, SIGNAL(gameOver()), this, SLOT(gameOver()));
+    connect(snake, SIGNAL(snakeNeedsFood()), this, SLOT(spawnFood()));
+    connect(this, SIGNAL(directionChanged(Snake::Direction)), snake, SLOT(directionChange(Snake::Direction)));
+    connect(this, SIGNAL(foodSpawned(QPoint)), snake, SLOT(foodSpawned(QPoint)));
 }
 
 void MainWindow::setupField()
 {
-    fieldSize = QPoint(10, 10);
+
+    field.clear();
 
     field = Field(fieldSize.x(), QVector<QCheckBox*>(fieldSize.y(), nullptr));
+
     for(int i = 0; i < fieldSize.x(); i++)
     {
         for(int j = 0; j < fieldSize.y(); j++)
         {
             field[i][j] = new QCheckBox(this);
+            field[i][j]->setAttribute(Qt::WA_TransparentForMouseEvents);
+            field[i][j]->setFocusPolicy(Qt::NoFocus);
             ui->gridLayout->addWidget(field[i][j], j, i, Qt::AlignCenter);
         }
     }
@@ -51,15 +61,19 @@ void MainWindow::setupField()
 
 void MainWindow::setupSnake()
 {
-    snake.setFieldSize(fieldSize);
+    snake->setFieldSize(fieldSize);
 }
 
 void MainWindow::setupWindow()
 {
     this->setWindowTitle("CheckBoxSnake");
     this->setFixedSize(fieldSize.x()*25, fieldSize.y()*25);
-    lvlLabel = new QLabel(this);
-    ui->statusbar->addWidget(lvlLabel);
+    if(firstSetup)
+    {
+        lvlLabel = new QLabel(this);
+        ui->statusbar->insertWidget(0, lvlLabel);
+    }
+    lvlLabel->setText("Score: " + QString::number(snake->getLvl()));
 }
 
 void MainWindow::drawSnake(const SnakeBody &snakeBody)
@@ -73,7 +87,7 @@ void MainWindow::drawSnake(const SnakeBody &snakeBody)
         currSnakeBody = snakeBody;
     }
 
-    lvlLabel->setText("Score: " + QString::number(snake.getLvl()));
+    lvlLabel->setText("Score: " + QString::number(snake->getLvl()));
 }
 
 void MainWindow::spawnFood()
@@ -99,19 +113,38 @@ void MainWindow::clearField()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << "keyPress: " << event->nativeVirtualKey();
-    if(event->nativeVirtualKey() == Qt::Key_W)
+    qDebug() << "keyPress: " << event->nativeScanCode();
+    if(event->text() == "w" || event->text() == "ц")
         emit directionChanged(Snake::UP);
-    if(event->nativeVirtualKey() == Qt::Key_S)
+    if(event->text() == "s" || event->text() == "ы")
         emit directionChanged(Snake::DOWN);
-    if(event->nativeVirtualKey() == Qt::Key_A)
+    if(event->text() == "a" || event->text() == "ф")
         emit directionChanged(Snake::LEFT);
-    if(event->nativeVirtualKey() == Qt::Key_D)
+    if(event->text() == "d" || event->text() == "в")
         emit directionChanged(Snake::RIGHT);
 }
 
 void MainWindow::gameOver()
 {
-    QMessageBox::information(this, "Game Over", "Поигали и хватит. Количество очков: " + QString::number(snake.getLvl()));
+    QMessageBox::information(this, "Game Over", "Поиграли и хватит. Количество очков: " + QString::number(snake->getLvl()));
     qApp->exit();
+}
+
+void MainWindow::on_actionChangeFieldSize_triggered()
+{
+    changeFieldSizeWindow changeFieldSize;
+    changeFieldSize.setFieldSize(fieldSize);
+    snake->pause();
+    qDebug() << "ChangeFieldSize";
+    if(changeFieldSize.exec() == QDialog::Accepted)
+    {
+        qDebug() << "Accepted";
+
+        fieldSize = changeFieldSize.getFieldSize();
+        qDebug() << fieldSize;
+
+        startSnake();
+    }
+    else
+        snake->resume();
 }

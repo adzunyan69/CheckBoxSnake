@@ -9,6 +9,7 @@
 #include <QRandomGenerator>
 #include <QLabel>
 #include "snake.h"
+#include"changefieldsizewindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -37,17 +38,19 @@ private:
 
     QLabel *lvlLabel;
 
-    Snake snake;
+    Snake *snake;
     SnakeBody currSnakeBody;
     Field field;
+    bool firstSetup = true;
 
+    void startSnake();
     void connectObjects();
     void setupField();
     void setupSnake();
     void setupWindow();
     void clearField();
 
-    QPoint fieldSize;
+    QPoint fieldSize = QPoint(10, 10);
 
 signals:
 
@@ -56,5 +59,7 @@ signals:
 
 
 
+private slots:
+    void on_actionChangeFieldSize_triggered();
 };
 #endif // MAINWINDOW_H

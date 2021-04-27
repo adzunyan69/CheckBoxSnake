@@ -29,8 +29,26 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Основное меню</string>
+    </property>
+    <addaction name="actionResults"/>
+    <addaction name="actionChangeFieldSize"/>
+   </widget>
+   <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionChangeFieldSize">
+   <property name="text">
+    <string>Изменить размер поля</string>
+   </property>
+  </action>
+  <action name="actionResults">
+   <property name="text">
+    <string>Результаты</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

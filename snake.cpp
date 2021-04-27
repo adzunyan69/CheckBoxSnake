@@ -2,12 +2,18 @@
 
 Snake::Snake(QObject *parent) : QObject(parent)
 {
-    snakeBody = {QPoint(4, 1)};
     direction = RIGHT;
+}
+
+void Snake::setStartSnakeBody()
+{
+    snakeBody = { QPoint(QRandomGenerator::global()->bounded(0, fieldSize.x() - 1),
+                  QRandomGenerator::global()->bounded(0, fieldSize.y() - 1)) };
 }
 
 void Snake::start()
 {
+    setStartSnakeBody();
     stepTimer.setInterval(1000);
     connect(&stepTimer, SIGNAL(timeout()), this, SLOT(snakeStep()));
     connect(this, SIGNAL(foodEaten()), this, SLOT(snakeLvlUp()));

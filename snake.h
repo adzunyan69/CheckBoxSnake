@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QPoint>
+#include <QRandomGenerator>
 #include <qmath.h>
 
 using SnakeBody = QVector<QPoint>;
@@ -31,6 +32,8 @@ public:
     void setFieldSize(QPoint _fieldSize) { fieldSize = _fieldSize; }
     void setFieldSize(unsigned x, unsigned y) { fieldSize.setX(x); fieldSize.setY(y); }
     int getLvl() { return lvl; }
+    void pause() { stepTimer.stop(); }
+    void resume() { stepTimer.start(); }
 
 public slots:
     void directionChange(Snake::Direction _direction);
@@ -44,6 +47,7 @@ signals:
     void gameOver();
 
 private:
+    void setStartSnakeBody();
     bool isEat();
     bool isCollision();
 };
