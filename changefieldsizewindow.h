@@ -16,7 +16,7 @@ public:
     explicit changeFieldSizeWindow(QWidget *parent = nullptr);
     ~changeFieldSizeWindow();
 
-    void setFieldSize(QPoint &_fieldSize);
+    void setFieldSize(const QPoint &_fieldSize);
     QPoint getFieldSize();
 
 private slots:

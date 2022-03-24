@@ -26,7 +26,7 @@ public:
     ~MainWindow();
 
 public slots:
-    void drawSnake(const SnakeBody &snake);
+    void drawSnake(const Snake::SnakeBody &snake);
     void spawnFood();
     void gameOver();
 
@@ -36,12 +36,12 @@ protected:
 private:
     Ui::MainWindow *ui;
 
-    QLabel *lvlLabel;
+    QLabel *lvlLabel { nullptr };
 
-    Snake *snake;
-    SnakeBody currSnakeBody;
+    Snake *snake { nullptr };
+    Snake::SnakeBody currSnakeBody;
     Field field;
-    bool firstSetup = true;
+    bool firstSetup { true };
 
     void startSnake();
     void connectObjects();
@@ -50,7 +50,7 @@ private:
     void setupWindow();
     void clearField();
 
-    QPoint fieldSize = QPoint(10, 10);
+    QPoint fieldSize { 10, 10 };
 
 signals:
 
@@ -61,5 +61,7 @@ signals:
 
 private slots:
     void on_actionChangeFieldSize_triggered();
+    void on_actionResults_triggered();
+    void on_actionStartStop_triggered();
 };
 #endif // MAINWINDOW_H

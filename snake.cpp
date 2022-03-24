@@ -2,7 +2,7 @@
 
 Snake::Snake(QObject *parent) : QObject(parent)
 {
-    direction = RIGHT;
+    direction = Direction::RIGHT;
 }
 
 void Snake::setStartSnakeBody()
@@ -15,15 +15,22 @@ void Snake::start()
 {
     setStartSnakeBody();
     stepTimer.setInterval(1000);
-    connect(&stepTimer, SIGNAL(timeout()), this, SLOT(snakeStep()));
-    connect(this, SIGNAL(foodEaten()), this, SLOT(snakeLvlUp()));
+    bool isConnect = connect(&stepTimer, &QTimer::timeout,
+                             this, &Snake::snakeStep) &&
+                     connect(this, &Snake::foodEaten,
+                             this, &Snake::snakeLvlUp);
+    if(isConnect == false)
+    {
+        qDebug() << "Connect signal and slots error.";
+        return;
+    }
     stepTimer.start();
     emit snakeBodyChanged(snakeBody);
 }
 
-void Snake::directionChange(Snake::Direction _direction)
+void Snake::directionChange(const Snake::Direction &_direction)
 {
-    qDebug() << "Direction chang";
+    qDebug() << "Direction changed";
     if(snakeBody.size() == 1)
     {
         direction = _direction;
@@ -32,19 +39,19 @@ void Snake::directionChange(Snake::Direction _direction)
 
     switch(_direction)
     {
-    case UP:
+    case Direction::UP:
         if(snakeBody.last().y() == (snakeBody.at(snakeBody.size() - 2).y() + 1))
             return;
         break;
-    case DOWN:
+    case Direction::DOWN:
         if(snakeBody.last().y() == (snakeBody.at(snakeBody.size() - 2).y() - 1))
             return;
         break;
-    case LEFT:
+    case Direction::LEFT:
         if(snakeBody.last().x() == (snakeBody.at(snakeBody.size() - 2).x() + 1))
             return;
         break;
-    case RIGHT:
+    case Direction::RIGHT:
         if(snakeBody.last().x() == (snakeBody.at(snakeBody.size() - 2).x() - 1))
             return;
         break;
@@ -82,23 +89,23 @@ void Snake::snakeStep()
     QPoint &head = snakeBody.last();
     switch(direction)
     {
-    case UP:
+    case Direction::UP:
         if(head.y() == 0)
             head.setY((fieldSize.y() - 1));
         else
         head.setY((head.y() - 1)%fieldSize.y());
 
         break;
-    case DOWN:
+    case Direction::DOWN:
         head.setY((head.y() + 1)%fieldSize.y());
         break;
-    case LEFT:
+    case Direction::LEFT:
         if(head.x() == 0)
             head.setX((fieldSize.x() - 1));
         else
             head.setX((head.x() - 1)%fieldSize.x());
         break;
-    case RIGHT:
+    case Direction::RIGHT:
         head.setX((head.x() + 1)%fieldSize.x());
         break;
 
@@ -114,24 +121,24 @@ void Snake::snakeStep()
         emit gameOver();
 }
 
-bool Snake::isEat()
+bool Snake::isEat() const
 {
     qDebug() << "currenFood: " << currentFood;
     switch (direction)
     {
-    case UP:
+    case Direction::UP:
         if((snakeBody.last().y() - 1) == currentFood.y() && snakeBody.last().x() == currentFood.x())
             return true;
         break;
-    case DOWN:
+    case Direction::DOWN:
         if((snakeBody.last().y() + 1) == currentFood.y() && snakeBody.last().x() == currentFood.x())
             return true;
         break;
-    case LEFT:
+    case Direction::LEFT:
         if((snakeBody.last().x() - 1) == currentFood.x() && snakeBody.last().y() == currentFood.y())
             return true;
         break;
-    case RIGHT:
+    case Direction::RIGHT:
         if((snakeBody.last().x() + 1) == currentFood.x() && snakeBody.last().y() == currentFood.y())
             return true;
         break;
@@ -140,7 +147,7 @@ bool Snake::isEat()
     return false;
 }
 
-bool Snake::isCollision()
+bool Snake::isCollision() const
 {
     const QPoint &head = snakeBody.last();
     for(int i = 0; i < snakeBody.size() - 1; i++)

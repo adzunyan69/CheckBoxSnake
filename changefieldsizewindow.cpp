@@ -19,7 +19,7 @@ changeFieldSizeWindow::~changeFieldSizeWindow()
     delete ui;
 }
 
-void changeFieldSizeWindow::setFieldSize(QPoint &_fieldSize)
+void changeFieldSizeWindow::setFieldSize(const QPoint &_fieldSize)
 {
     ui->lineEdit_x->setText(QString::number(_fieldSize.x()));
     ui->lineEdit_y->setText(QString::number(_fieldSize.y()));

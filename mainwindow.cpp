@@ -31,11 +31,21 @@ void MainWindow::startSnake()
 
 void MainWindow::connectObjects()
 {
-    connect(snake, SIGNAL(snakeBodyChanged(const SnakeBody&)), this, SLOT(drawSnake(const SnakeBody&)));
-    connect(snake, SIGNAL(gameOver()), this, SLOT(gameOver()));
-    connect(snake, SIGNAL(snakeNeedsFood()), this, SLOT(spawnFood()));
-    connect(this, SIGNAL(directionChanged(Snake::Direction)), snake, SLOT(directionChange(Snake::Direction)));
-    connect(this, SIGNAL(foodSpawned(QPoint)), snake, SLOT(foodSpawned(QPoint)));
+    bool isConnect = connect(snake, &Snake::snakeBodyChanged,
+                             this, &MainWindow::drawSnake) &&
+                     connect(snake, &Snake::gameOver,
+                             this, &MainWindow::spawnFood) &&
+                     connect(snake, &Snake::snakeNeedsFood,
+                             this, &MainWindow::spawnFood) &&
+                     connect(this, &MainWindow::directionChanged,
+                             snake, &Snake::directionChange) &&
+                     connect(this, &MainWindow::foodSpawned,
+                             snake, &Snake::foodSpawned);
+    if(isConnect == false)
+    {
+        qDebug() << "Connect signal slot error";
+        // ... exception
+    }
 }
 
 void MainWindow::setupField()
@@ -76,7 +86,7 @@ void MainWindow::setupWindow()
     lvlLabel->setText("Score: " + QString::number(snake->getLvl()));
 }
 
-void MainWindow::drawSnake(const SnakeBody &snakeBody)
+void MainWindow::drawSnake(const Snake::SnakeBody &snakeBody)
 {
     clearField();
 
@@ -115,13 +125,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     qDebug() << "keyPress: " << event->nativeScanCode();
     if(event->text() == "w" || event->text() == "ц")
-        emit directionChanged(Snake::UP);
+        emit directionChanged(Snake::Direction::UP);
     if(event->text() == "s" || event->text() == "ы")
-        emit directionChanged(Snake::DOWN);
+        emit directionChanged(Snake::Direction::DOWN);
     if(event->text() == "a" || event->text() == "ф")
-        emit directionChanged(Snake::LEFT);
+        emit directionChanged(Snake::Direction::LEFT);
     if(event->text() == "d" || event->text() == "в")
-        emit directionChanged(Snake::RIGHT);
+        emit directionChanged(Snake::Direction::RIGHT);
 }
 
 void MainWindow::gameOver()
@@ -148,3 +158,21 @@ void MainWindow::on_actionChangeFieldSize_triggered()
     else
         snake->resume();
 }
+
+void MainWindow::on_actionResults_triggered()
+{
+
+}
+
+void MainWindow::on_actionStartStop_triggered()
+{
+    // temp static flag
+    static bool isSnakeStarted = true;
+    if(isSnakeStarted)
+        snake->pause();
+    else
+        snake->resume();
+
+    isSnakeStarted = !isSnakeStarted;
+}
+
